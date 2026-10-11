@@ -9,9 +9,21 @@ A fan-made encyclopedia where **every one of the Quran's 6,236 verses (ayahs) ge
 - **6,236 unique verse pages** — hash-routed (`#/ayah/1` … `#/ayah/6236`), each with:
   - The real Arabic (Uthmani) text + Saheeh International translation, loaded live from the AlQuran.cloud API
   - A unique themed title (e.g. *“Verdict of the Broken Lantern”*)
-  - An assigned **class & spec** (Warrior → Demon Hunter), **signature spell** (all real WoW spells), **zone**, **dungeon or raid**, **relic**, **faction**, and a **rarity tier** (Common → Mythic)
+  - An assigned **class & spec** (Warrior → Demon Hunter), **spell cast in that room**, **zone**, **dungeon or raid floor**, **loot** (treasure/boss/sanctum rooms), **faction**, and a **rarity tier** tied to room type
   - A clearly-labeled *fan flavor* line of fantasy lore
-- **114 Tomes** — every surah is a codex tome shelved in a WoW location (`#/tomes`, `#/surah/N`)
+
+## 🗺️ The dungeon-crawl flow
+The codex is laid out as one continuous dungeon run, so consecutive verses read as a journey:
+
+- Each **surah = a dungeon floor** (114 floors), delved in order
+- Each floor is split into **encounters of 5–9 rooms**; every verse = one room with a type that flows from the last:
+  `Gate → Corridor → (Crossroads / Trap / Trial / Guardian / Treasure Vault / Fountain Rest) → Boss Lair → Sanctum`
+- Flavor text is written as a **continuing story** — each room says what happened there and what lies ahead (*“Ahead: the Guardian's Hall”*), spells match rooms (travel spells in corridors, wards in traps, big damage in boss lairs), and loot only drops where loot makes sense
+- Rarity scales with depth: Gates and Corridors are Common; Boss Lairs drop Epic/Legendary; Sanctums hold Legendary/Mythic
+- **🗺️ 2D dungeon maps you can follow along**:
+  - Every verse page has a **follow-along corridor strip** — the current encounter's rooms drawn as an SVG dungeon corridor, your position pulsing gold, visited rooms lit, unexplored rooms in fog; click any room to walk there, plus “came from / next room” links
+  - Every floor page (`#/surah/N`) has a full **serpentine floor plan** with descent stairs between encounter rows
+  - `#/map` — the **Grand Dungeon Map**: all 114 floors, your banner, depth bar and room-type legend
 - **Class codex** — browse verses by class (`#/classes`, `#/class/Mage`)
 - **Librarium search** — search everything: verse numbers, titles, spells, zones, raids… (`#/search`)
 - **Keyboard navigation** — `←` / `→` prev/next verse, `R` for a random verse
@@ -31,6 +43,8 @@ python -m http.server 8080
 ```
 
 ## 🧭 Structure
+
+Verse data arrays: `[surah, ayah, encounter, roomPos, encounterLen, roomType, title, spell, loot, rarity, flavor]`. Room types: `GT` Gate, `CO` Corridor, `CX` Crossroads, `TR` Trap Run, `TL` Trial, `GR` Guardian, `TV` Treasure Vault, `RS` Fountain Rest, `BS` Boss Lair, `SC` Sanctum.
 
 ```
 index.html      — shell + fonts + footer disclaimer

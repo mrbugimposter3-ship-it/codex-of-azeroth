@@ -166,3 +166,55 @@ mark{background:var(--gold);color:#111;border-radius:3px;padding:0 3px}
 kbd{background:#1c2742;border:1px solid var(--gold-dim);border-radius:5px;padding:1px 7px;font-size:.8rem;color:var(--gold)}
 
 @media(max-width:640px){.topbar{justify-content:center}.brand-text{font-size:1rem}}
+
+/* ================= 2D DUNGEON MAPS ================= */
+.dmap{width:100%;height:auto;display:block}
+.dmap-strip{max-width:100%}
+.map-corridor{stroke:var(--gold-dim);stroke-width:3;stroke-dasharray:7 6;opacity:.55;animation:march 1.2s linear infinite}
+@keyframes march{to{stroke-dashoffset:-13}}
+.room-box{fill:#101a30;stroke:var(--rc,#e8c76a);stroke-width:1.6;transition:all .3s;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5))}
+.map-room[data-state="fog"] .room-box{fill:#0a0f1c;stroke:#3a4358;stroke-dasharray:4 4;opacity:.65}
+.map-room[data-state="seen"] .room-box{stroke-width:2.2;opacity:1}
+.map-room[data-state="cur"] .room-box{stroke-width:3;fill:#1c2440;animation:roomPulse 1.6s ease-in-out infinite}
+@keyframes roomPulse{0%,100%{filter:drop-shadow(0 0 4px var(--rc))}50%{filter:drop-shadow(0 0 18px var(--rc))}}
+.map-room{cursor:pointer}
+.map-room:hover .room-box{stroke-width:3.4;fill:#232f52}
+.room-icon{font-size:17px;pointer-events:none}
+.room-name{fill:var(--parchment);font-size:9.5px;font-family:'Cinzel',serif;letter-spacing:.04em;pointer-events:none}
+.room-verse{fill:#8f8672;font-size:8.5px;pointer-events:none}
+.map-room[data-state="fog"] .room-name,.map-room[data-state="fog"] .room-verse{opacity:.45}
+.map-title{fill:var(--gold-dim);font-size:11px;font-family:'Cinzel',serif;letter-spacing:.25em}
+.map-side{fill:var(--gold);font-size:14px;font-family:'Cinzel',serif;letter-spacing:.1em}
+.map-stairs{stroke:var(--gold-dim);stroke-width:2;stroke-dasharray:3 5;opacity:.6}
+.map-stairs-label{fill:var(--gold-dim);font-size:9px;font-family:'Cinzel',serif;letter-spacing:.2em}
+
+/* follow-along strip on ayah page */
+.map-follow{margin:18px 0 6px;padding:16px;border:1px solid var(--panel-b);border-radius:12px;background:rgba(8,13,26,.7)}
+.map-follow-label{font-size:.85rem;color:var(--gold-dim);letter-spacing:.1em;margin-bottom:10px;text-align:center}
+.map-follow-nav{display:flex;justify-content:space-between;gap:12px;margin-top:8px;flex-wrap:wrap}
+.map-follow-nav a{padding:7px 14px;border:1px solid var(--panel-b);border-radius:8px;font-size:.9rem;transition:all .25s}
+.map-follow-nav a:hover{border-color:var(--gold);transform:translateY(-2px)}
+
+/* depth bar */
+.depth-bar{height:8px;max-width:420px;margin:16px auto 6px;border-radius:99px;background:#0a0f1c;border:1px solid var(--panel-b);overflow:hidden}
+.depth-bar.big{height:14px;max-width:640px;margin-top:20px}
+.depth-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#3df06e,var(--gold),#ff9a2e);background-size:200% 100%;animation:depthShine 3s linear infinite;box-shadow:0 0 12px rgba(232,199,106,.6)}
+@keyframes depthShine{to{background-position:200% 0}}
+
+/* grand map */
+.map-legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0 22px}
+.legend-dot{font-size:.8rem;color:var(--rc);border:1px solid var(--rc);border-radius:999px;padding:3px 12px;opacity:.85}
+.grandmap{display:flex;flex-direction:column;gap:10px}
+.floor-row{padding:10px 16px;border:1px solid var(--panel-b);border-radius:12px;background:rgba(10,16,32,.55);transition:all .3s}
+.floor-row:hover{border-color:var(--gold-dim)}
+.floor-here{border-color:var(--gold);box-shadow:0 0 18px rgba(232,199,106,.25);animation:hereGlow 2.5s ease-in-out infinite}
+@keyframes hereGlow{0%,100%{box-shadow:0 0 10px rgba(232,199,106,.15)}50%{box-shadow:0 0 26px rgba(232,199,106,.4)}}
+.floor-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+.floor-num{font-family:'Cinzel',serif;color:var(--gold-dim);font-size:.8rem;letter-spacing:.18em}
+.floor-name{font-family:'Cinzel',serif;color:var(--gold);font-size:1.02rem}
+.floor-dun{margin-left:auto;color:#8f8672;font-size:.82rem}
+.enc-dots{width:100%;max-width:760px;height:30px}
+.enc-dot{fill:#1a2340;stroke:var(--gold-dim);stroke-width:1;transition:all .25s;cursor:pointer}
+.enc-dots a:hover .enc-dot{fill:#2c3a63;stroke:var(--gold)}
+.enc-dot.enc-big{stroke:var(--arcane)}
+.enc-dot-label{fill:#9aa4b5;font-size:9px;pointer-events:none}
