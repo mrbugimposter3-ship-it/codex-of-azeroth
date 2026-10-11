@@ -1,0 +1,168 @@
+/* ================= THE CODEX OF AZEROTH ================= */
+:root{
+  --gold:#e8c76a; --gold-dim:#b0954a; --parchment:#efe3c2; --ink:#2a2118;
+  --bg0:#070b14; --bg1:#0d1424; --panel:rgba(16,24,44,.82); --panel-b:rgba(232,199,106,.25);
+  --horde:#c41e1e; --alliance:#2a6fd4; --fel:#7cff4f; --arcane:#a34ee0; --frost:#5ec9ff;
+  --r-common:#9aa4b5; --r-uncommon:#3df06e; --r-rare:#4a90ff; --r-epic:#b45cff; --r-legendary:#ff9a2e; --r-mythic:#ff4655;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'MedievalSharp',Georgia,serif; color:var(--parchment);
+  background:radial-gradient(1200px 800px at 70% -10%,#16234a 0%,transparent 60%),
+             radial-gradient(900px 700px at 10% 110%,#1c1233 0%,transparent 55%),
+             linear-gradient(180deg,var(--bg0),var(--bg1) 60%,#05070d);
+  min-height:100vh; overflow-x:hidden;
+}
+::selection{background:var(--gold);color:#111}
+a{color:var(--gold);text-decoration:none}
+a:hover{color:#fff;text-shadow:0 0 12px var(--gold)}
+
+/* ---------- Starfield ---------- */
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ---------- Floating runes ---------- */
+.runes{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.runes span{position:absolute;bottom:-60px;font-size:26px;color:var(--gold-dim);opacity:0;
+  animation:runeRise linear infinite;text-shadow:0 0 14px var(--gold)}
+@keyframes runeRise{
+  0%{transform:translateY(0) rotate(0deg);opacity:0}
+  12%{opacity:.55}
+  85%{opacity:.25}
+  100%{transform:translateY(-110vh) rotate(340deg);opacity:0}
+}
+
+/* ---------- Top bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  gap:14px;padding:12px 22px;flex-wrap:wrap;
+  background:linear-gradient(180deg,rgba(7,11,20,.95),rgba(7,11,20,.75));
+  border-bottom:1px solid var(--panel-b);backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Cinzel',serif;font-size:1.25rem;font-weight:800;letter-spacing:.06em;color:var(--parchment)}
+.brand-glyph{display:inline-grid;place-items:center;width:40px;height:40px;border:2px solid var(--gold);border-radius:50%;
+  color:var(--gold);font-size:1.2rem;animation:glyphSpin 14s linear infinite;box-shadow:0 0 18px rgba(232,199,106,.35),inset 0 0 12px rgba(232,199,106,.2)}
+@keyframes glyphSpin{to{transform:rotate(360deg)}}
+.brand em{color:var(--gold);font-style:normal}
+.nav-links{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nav-links>a{padding:8px 14px;border:1px solid transparent;border-radius:8px;color:var(--parchment);transition:all .25s}
+.nav-links>a:hover{border-color:var(--panel-b);background:rgba(232,199,106,.08)}
+.nav-links>a.active{border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(232,199,106,.25)}
+.btn-rune{font-family:inherit;background:linear-gradient(180deg,#233350,#16233c);color:var(--gold);border:1px solid var(--gold-dim);
+  padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .25s}
+.btn-rune:hover{background:linear-gradient(180deg,#31466b,#20304e);box-shadow:0 0 18px rgba(232,199,106,.35);transform:translateY(-1px)}
+.btn-rune:active{transform:translateY(1px) scale(.98)}
+
+/* ---------- Portal frame (page corner ornament) ---------- */
+.portal-frame{position:fixed;right:-70px;top:18vh;z-index:1;width:220px;height:220px;pointer-events:none;opacity:.5}
+.portal-ring{position:absolute;inset:0;border-radius:50%;border:2px dashed var(--arcane);animation:portalSpin 24s linear infinite;
+  box-shadow:0 0 30px rgba(163,78,224,.4),inset 0 0 30px rgba(163,78,224,.25)}
+.portal-ring.r2{inset:26px;border:1px solid var(--frost);animation-duration:16s;animation-direction:reverse}
+.portal-core{position:absolute;inset:74px;border-radius:50%;background:radial-gradient(circle,rgba(163,78,224,.5),transparent 70%);
+  animation:corePulse 5s ease-in-out infinite}
+@keyframes portalSpin{to{transform:rotate(360deg)}}
+@keyframes corePulse{0%,100%{transform:scale(.85);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+@media(max-width:900px){.portal-frame{display:none}}
+
+/* ---------- Layout ---------- */
+#app{position:relative;z-index:10;max-width:1060px;margin:0 auto;padding:34px 20px 60px;min-height:60vh}
+#app.entering{animation:pageEnter .55s cubic-bezier(.2,.8,.2,1)}
+@keyframes pageEnter{from{opacity:0;transform:translateY(26px) scale(.99)}to{opacity:1;transform:none}}
+
+h1,h2,h3{font-family:'Cinzel',serif;color:var(--gold);letter-spacing:.04em}
+.hero-title{font-size:clamp(2rem,5.5vw,3.4rem);text-align:center;
+  text-shadow:0 0 24px rgba(232,199,106,.4),0 2px 0 #000;animation:titleGlow 4s ease-in-out infinite}
+@keyframes titleGlow{0%,100%{text-shadow:0 0 18px rgba(232,199,106,.35)}50%{text-shadow:0 0 42px rgba(232,199,106,.75)}}
+.sub{text-align:center;color:#c8b98d;margin:10px 0 26px;font-size:1.05rem}
+
+.divider{display:flex;align-items:center;gap:14px;margin:26px 0;color:var(--gold-dim)}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+
+/* ---------- Cards ---------- */
+.card{position:relative;background:var(--panel);border:1px solid var(--panel-b);border-radius:14px;padding:22px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.05);
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,border-color .3s}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.6),0 0 24px rgba(232,199,106,.15);border-color:var(--gold-dim)}
+.stagger>*{opacity:0;transform:translateY(18px);animation:riseIn .6s cubic-bezier(.2,.8,.2,1) forwards}
+.stagger>*:nth-child(1){animation-delay:.03s}.stagger>*:nth-child(2){animation-delay:.09s}.stagger>*:nth-child(3){animation-delay:.15s}
+.stagger>*:nth-child(4){animation-delay:.21s}.stagger>*:nth-child(5){animation-delay:.27s}.stagger>*:nth-child(6){animation-delay:.33s}
+.stagger>*:nth-child(7){animation-delay:.39s}.stagger>*:nth-child(8){animation-delay:.45s}.stagger>*:nth-child(9){animation-delay:.51s}
+@keyframes riseIn{to{opacity:1;transform:none}}
+
+/* rarity colors */
+.r-Common{--rc:var(--r-common)} .r-Uncommon{--rc:var(--r-uncommon)} .r-Rare{--rc:var(--r-rare)}
+.r-Epic{--rc:var(--r-epic)} .r-Legendary{--rc:var(--r-legendary)} .r-Mythic{--rc:var(--r-mythic)}
+.rarity{display:inline-block;padding:3px 12px;border-radius:999px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--rc,var(--gold));border:1px solid var(--rc,var(--gold));text-shadow:0 0 10px var(--rc,var(--gold));animation:rarityPulse 3s ease-in-out infinite}
+@keyframes rarityPulse{0%,100%{box-shadow:0 0 6px color-mix(in srgb,var(--rc,var(--gold)) 40%,transparent)}50%{box-shadow:0 0 18px color-mix(in srgb,var(--rc,var(--gold)) 80%,transparent)}}
+
+/* ---------- Ayah page ---------- */
+.ayah-head{text-align:center;margin-bottom:20px}
+.ayah-eyebrow{color:var(--gold-dim);letter-spacing:.28em;text-transform:uppercase;font-size:.8rem}
+.ayah-title{font-size:clamp(1.6rem,4vw,2.6rem);margin-top:8px}
+.arabic{font-family:'Amiri',serif;font-size:clamp(1.5rem,3.4vw,2.15rem);line-height:2.15;text-align:center;direction:rtl;
+  padding:26px 10px;border-top:1px solid var(--panel-b);border-bottom:1px solid var(--panel-b);margin:16px 0;
+  background:linear-gradient(180deg,rgba(232,199,106,.05),transparent);animation:arabicGlow 6s ease-in-out infinite}
+@keyframes arabicGlow{0%,100%{text-shadow:0 0 6px rgba(232,199,106,.2)}50%{text-shadow:0 0 22px rgba(232,199,106,.55)}}
+.translation{font-size:1.08rem;line-height:1.85;color:#e6dcc0;text-align:center;font-style:italic}
+.ref{display:block;text-align:center;color:var(--gold-dim);margin-top:10px;font-size:.9rem;letter-spacing:.15em}
+
+.codex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:22px}
+.chip-card{padding:16px;border:1px solid var(--panel-b);border-radius:12px;background:rgba(10,16,32,.6);transition:all .3s}
+.chip-card:hover{border-color:var(--gold);transform:translateY(-3px) rotate(-.4deg);box-shadow:0 0 20px rgba(232,199,106,.18)}
+.chip-card .k{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim);display:block;margin-bottom:6px}
+.chip-card .v{font-size:1.05rem;color:var(--parchment)}
+.flavor{margin-top:22px;padding:18px 22px;border-left:3px solid var(--fel);border-radius:0 12px 12px 0;
+  background:linear-gradient(90deg,rgba(124,255,79,.07),transparent);color:#dfe8d0;line-height:1.7}
+.flavor .k{color:var(--fel);font-size:.75rem;letter-spacing:.24em;text-transform:uppercase;display:block;margin-bottom:6px}
+
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:30px;flex-wrap:wrap}
+.pager a{padding:10px 18px;border:1px solid var(--panel-b);border-radius:10px;transition:all .25s}
+.pager a:hover{border-color:var(--gold);transform:translateY(-2px)}
+
+/* ---------- Grid of tomes / classes / results ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.tome-card .num{font-family:'Cinzel',serif;color:var(--gold-dim);font-size:.85rem;letter-spacing:.2em}
+.tome-card .name{font-family:'Cinzel',serif;font-size:1.25rem;color:var(--gold);margin:6px 0 2px}
+.tome-card .ar{font-family:'Amiri',serif;font-size:1.35rem;color:#cbb;display:block;text-align:right;margin-top:4px}
+.meta{color:#a99f83;font-size:.85rem}
+
+/* ---------- Search ---------- */
+.search-row{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap}
+.search-row input,.search-row select{flex:1;min-width:180px;font-family:inherit;font-size:1rem;padding:12px 16px;border-radius:10px;
+  border:1px solid var(--panel-b);background:rgba(8,13,26,.85);color:var(--parchment);outline:none;transition:all .25s}
+.search-row input:focus,.search-row select:focus{border-color:var(--gold);box-shadow:0 0 16px rgba(232,199,106,.3)}
+.results{display:grid;gap:10px}
+.res{display:flex;gap:14px;align-items:baseline;padding:14px 18px;border:1px solid var(--panel-b);border-radius:10px;transition:all .25s;background:rgba(10,16,32,.55)}
+.res:hover{border-color:var(--gold);transform:translateX(4px)}
+.res .n{font-family:'Cinzel',serif;color:var(--gold-dim);min-width:56px}
+.res .t{color:var(--parchment)}
+.res .m{margin-left:auto;color:#8f8672;font-size:.85rem;white-space:nowrap}
+mark{background:var(--gold);color:#111;border-radius:3px;padding:0 3px}
+
+/* ---------- Class page ---------- */
+.class-hero{text-align:center;padding:40px 20px;margin-bottom:24px}
+.class-hero .crest{font-size:3.2rem;display:block;animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.spec-tag{display:inline-block;padding:4px 14px;margin:4px;border:1px solid var(--panel-b);border-radius:999px;font-size:.85rem}
+.count-bubble{display:inline-grid;place-items:center;min-width:34px;height:34px;padding:0 8px;border-radius:50%;
+  background:rgba(232,199,106,.12);border:1px solid var(--gold-dim);color:var(--gold);font-family:'Cinzel',serif}
+
+/* ---------- Stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:30px 0}
+.stat{text-align:center;padding:20px 10px;border:1px solid var(--panel-b);border-radius:14px;background:var(--panel);transition:all .3s}
+.stat:hover{border-color:var(--gold);transform:scale(1.04)}
+.stat .big{font-family:'Cinzel',serif;font-size:2rem;color:var(--gold);display:block;animation:countUp 1.4s ease-out}
+@keyframes countUp{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.stat .lbl{font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dim)}
+
+/* ---------- Loading shimmer ---------- */
+.shimmer{height:120px;border-radius:12px;border:1px solid var(--panel-b);overflow:hidden;position:relative;background:rgba(10,16,32,.5)}
+.shimmer::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(232,199,106,.12),transparent);animation:shimmer 1.4s infinite}
+@keyframes shimmer{to{transform:translateX(100%)}}
+
+/* ---------- Footer ---------- */
+.site-footer{position:relative;z-index:10;max-width:900px;margin:0 auto;padding:26px 20px 50px;color:#9d947c;font-size:.9rem;text-align:center;line-height:1.8}
+.site-footer .muted{color:#6d6553;font-size:.8rem;margin-top:8px}
+kbd{background:#1c2742;border:1px solid var(--gold-dim);border-radius:5px;padding:1px 7px;font-size:.8rem;color:var(--gold)}
+
+@media(max-width:640px){.topbar{justify-content:center}.brand-text{font-size:1rem}}

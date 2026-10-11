@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Codex of Azeroth — A WoW-Themed Quranic Encyclopedia</title>
+<meta name="description" content="A fan-made encyclopedia where each of the Quran's 6,236 verses receives its own unique World of Warcraft-themed codex page — classes, spells, zones, dungeons and raids.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=MedievalSharp&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<div class="runes" aria-hidden="true"></div>
+
+<nav class="topbar">
+  <a class="brand" href="#/">
+    <span class="brand-glyph">⚔</span>
+    <span class="brand-text">The Codex <em>of Azeroth</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="#/" data-nav="home">Grand Hall</a>
+    <a href="#/tomes" data-nav="tomes">114 Tomes</a>
+    <a href="#/classes" data-nav="classes">Classes</a>
+    <a href="#/search" data-nav="search">Search</a>
+    <button id="random-btn" class="btn-rune" title="Random verse (R)">🎲 Random Verse</button>
+  </div>
+</nav>
+
+<div class="portal-frame" aria-hidden="true"><div class="portal-ring"></div><div class="portal-ring r2"></div><div class="portal-core"></div></div>
+
+<main id="app" tabindex="-1"></main>
+
+<footer class="site-footer">
+  <p><strong>Disclaimer:</strong> This is a fan-made, purely creative crossover between the Quran and World of Warcraft.
+  The Quranic text is displayed verbatim via the <a href="https://alquran.cloud" target="_blank" rel="noopener">AlQuran.cloud API</a>.
+  All WoW names, places and flavor text are fantasy fiction for fun — none of it is religious commentary, interpretation, or endorsed by Blizzard Entertainment.</p>
+  <p class="muted">6,236 verses · 114 surahs · 12 classes · ⚔ Built in the spirit of both worlds</p>
+</footer>
+
+<script src="data/data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
