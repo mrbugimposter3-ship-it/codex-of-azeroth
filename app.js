@@ -46,6 +46,105 @@ function chip(k, v, icon) {
   return `<div class="chip-card"><span class="k">${icon ? icon + " " : ""}${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
 }
 
+/* ---------- deterministic hash + boss generator ---------- */
+function jhash(n, salt) {
+  let x = (n * 2654435761 + salt * 40503 + 0x9E3779B9) >>> 0;
+  x ^= x >>> 13; x = (x * 1274126177) >>> 0; x ^= x >>> 16;
+  return x >>> 0;
+}
+const BOS_PRE = ["Mor","Zul","Thal","Kael","Naz","Ver","Dro","Gal","Azj","Uld","Ran","Sar","Kel","Mal","Tor","Bar","Ana","Nok","Fel","Vor","Gor","Hy","Vex","Qir"];
+const BOS_MID = ["ga","ran","thas","kir","ok","mir","den","us","ath","esh","ul","ion","dra","nis","rok","vek","osh","ida","ur","ax"];
+const BOS_TITLES = ["the Unbound","the Gatekeeper","Warden of {zone}","the {elem}touched","Herald of the Deep","Keeper of the Last Seal","the Undying","Scourge of {zone}","the Hollow King","the Silent Coil","Dread Adept of {elem}","the Iron Vigil","the Ashen Tyrant","the Veiled One","the Soulbinder","Tyrant of the {adj} Halls"];
+const BOS_TAUNTS = [
+  "None shall pass while I draw breath.",
+  "My chains are older than your kingdom.",
+  "You disturb a sleep of ten thousand years.",
+  "Turn back — the dark ahead is not for the living.",
+  "I have broken mightier heroes than you.",
+  "This hall was built upon my name.",
+  "The Sanctum keeps itself. So do I.",
+  "Your banners will join the others in the dust.",
+  "Come, then. The Codex needs another ending.",
+  "Even light bends in this place.",
+  "I was guarding this room before your gods had names.",
+  "Deep calls to deep. I answer."
+];
+function bossOf(surah, enc) {
+  const seed = surah * 1009 + enc, t = D.tomes[surah - 1];
+  const name = BOS_PRE[jhash(seed, 1) % BOS_PRE.length]
+    + BOS_MID[jhash(seed, 2) % BOS_MID.length]
+    + (jhash(seed, 3) % 3 === 0 ? BOS_MID[jhash(seed, 4) % BOS_MID.length] : "");
+  const adj = ["Ashen","Frozen","Verdant","Umbral","Gilded","Stormforged"][jhash(seed, 7) % 6];
+  const title = BOS_TITLES[jhash(seed, 5) % BOS_TITLES.length]
+    .replace("{zone}", t.tome).replace("{elem}", t.elem).replace("{adj}", adj);
+  const taunt = BOS_TAUNTS[jhash(seed, 6) % BOS_TAUNTS.length];
+  return { name, title, taunt };
+}
+
+/* ---------- delve log (localStorage) + achievements ---------- */
+const LOG_KEY = "wqe-visited", ACH_KEY = "wqe-ach";
+let visited = new Set();
+try { visited = new Set(JSON.parse(localStorage.getItem(LOG_KEY) || "[]")); } catch (e) {}
+function saveVisited() { try { localStorage.setItem(LOG_KEY, JSON.stringify([...visited])); } catch (e) {} }
+function statsOf(set) {
+  let rooms = 0, bosses = 0, sanctums = 0, leg = 0, myth = 0, treasure = 0;
+  const floors = new Set(), cleared = new Set();
+  for (const n of set) {
+    const v = byGlobal(n); if (!v) continue;
+    rooms++;
+    if (v[5] === "BS") bosses++;
+    if (v[5] === "SC") sanctums++;
+    if (v[9] === "Legendary") leg++;
+    if (v[9] === "Mythic") myth++;
+    if (v[8]) treasure++;
+    floors.add(v[0]); if (v[5] === "SC") cleared.add(v[0]);
+  }
+  return { rooms, bosses, sanctums, leg, myth, treasure, floors: floors.size, cleared: cleared.size };
+}
+const levelOf = rooms => Math.floor(Math.sqrt(rooms) / 1.8) + 1;
+const ACHIEVEMENTS = [
+  { id: "first-step",  icon: "🥾", name: "First Step",            desc: "Enter your first room of the Grand Dungeon.",        test: s => s.rooms >= 1 },
+  { id: "delve-100",   icon: "🔥", name: "Deep Delver",           desc: "Delve 100 rooms.",                                   test: s => s.rooms >= 100 },
+  { id: "delve-500",   icon: "🧭", name: "Cartographer",          desc: "Delve 500 rooms.",                                   test: s => s.rooms >= 500 },
+  { id: "delve-1000",  icon: "⚜", name: "Legend of the Codex",    desc: "Delve 1,000 rooms.",                                 test: s => s.rooms >= 1000 },
+  { id: "halfway",     icon: "🌗", name: "Halfway to the Heart",   desc: "Delve 3,118 rooms — the midpoint of the descent.",   test: s => s.rooms >= 3118 },
+  { id: "completionist", icon: "👑", name: "The Grand Delve",      desc: "Delve all 6,236 rooms.",                             test: s => s.rooms >= 6236 },
+  { id: "first-blood", icon: "🗡️", name: "First Blood",           desc: "Engage your first Boss Lair.",                       test: s => s.bosses >= 1 },
+  { id: "boss-10",     icon: "💀", name: "Boss Breaker",          desc: "Engage 10 Boss Lairs.",                              test: s => s.bosses >= 10 },
+  { id: "boss-50",     icon: "⚔", name: "Slayer of Keepers",     desc: "Engage 50 Boss Lairs.",                              test: s => s.bosses >= 50 },
+  { id: "boss-100",    icon: "🏆", name: "Century of Skulls",     desc: "Engage 100 Boss Lairs.",                             test: s => s.bosses >= 100 },
+  { id: "first-sanctum", icon: "🔮", name: "Sanctum Sealed",       desc: "Complete your first encounter-chain: reach a Sanctum.", test: s => s.sanctums >= 1 },
+  { id: "floor-1",     icon: "🗺️", name: "Floor Cleared",         desc: "Fully clear a floor — reach its final Sanctum.",     test: s => s.cleared >= 1 },
+  { id: "floor-10",    icon: "🪜", name: "Stair Descender",       desc: "Fully clear 10 floors.",                             test: s => s.cleared >= 10 },
+  { id: "floor-all",   icon: "🌌", name: "Master of the Deep",    desc: "Fully clear all 114 floors.",                        test: s => s.cleared >= 114 },
+  { id: "legendary",   icon: "🟠", name: "Legendary Loot",        desc: "Stand in a room of Legendary rarity.",               test: s => s.leg >= 1 },
+  { id: "mythic",      icon: "🔴", name: "Mythic Moment",         desc: "Stand in a room of Mythic rarity.",                  test: s => s.myth >= 1 },
+  { id: "hoard-25",    icon: "💰", name: "Hoarder",               desc: "Claim loot in 25 vaults, lairs or sanctums.",        test: s => s.treasure >= 25 },
+  { id: "scout-20",    icon: "🔭", name: "Scout of the Deep",     desc: "Set foot on 20 different floors.",                   test: s => s.floors >= 20 },
+];
+function toast(a) {
+  const el = document.createElement("div");
+  el.className = "ach-toast";
+  el.innerHTML = `<span class="ach-toast-icon">${a.icon}</span><div><div class="ach-toast-title">Achievement unlocked!</div><div class="ach-toast-name">${esc(a.name)}</div><div class="ach-toast-desc">${esc(a.desc)}</div></div>`;
+  document.body.appendChild(el);
+  setTimeout(() => el.classList.add("show"), 60);
+  setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 600); }, 5200);
+}
+function visit(n) {
+  if (!visited.has(n)) {
+    visited.add(n); saveVisited();
+    const st = statsOf(visited);
+    let unlocked;
+    try { unlocked = new Set(JSON.parse(localStorage.getItem(ACH_KEY) || "[]")); } catch (e) { unlocked = new Set(); }
+    const newly = ACHIEVEMENTS.filter(a => !unlocked.has(a.id) && a.test(st));
+    if (newly.length) {
+      newly.forEach(a => unlocked.add(a.id));
+      try { localStorage.setItem(ACH_KEY, JSON.stringify([...unlocked])); } catch (e) {}
+      newly.slice(0, 3).forEach((a, i) => setTimeout(() => toast(a), 400 + i * 900));
+    }
+  }
+}
+
 /* ---------- starfield + runes ---------- */
 (function starfield() {
   const cv = document.getElementById("starfield"), ctx = cv.getContext("2d");
@@ -104,12 +203,15 @@ function roomRowSVG(ayahs, curGlobal, y, x0, dir, opts = {}) {
     const cx = dir > 0 ? x0 + i * cell : x0 - i * cell;
     const state = curGlobal == null ? (opts.explored ? "seen" : "fog") : (g < curGlobal ? "seen" : g === curGlobal ? "cur" : "fog");
     const rt = v[5];
+    const boss = rt === "BS" ? bossOf(v[0], v[2]) : null;
     out += `<a href="${verseURL(g)}" class="map-room" data-state="${state}">
+      <title>${esc(boss ? boss.name + " — " + boss.title : ROOM[rt] + " — room " + g)}</title>
       <rect x="${cx - RW/2}" y="${y - RH/2}" width="${RW}" height="${RH}" rx="12"
         style="--rc:${ROOM_COLORS[rt]}" class="room-box ${state === "cur" ? "room-cur" : ""}"/>
       <text x="${cx}" y="${y - 10}" text-anchor="middle" class="room-icon">${ROOM_ICONS[rt]}</text>
       <text x="${cx}" y="${y + 12}" text-anchor="middle" class="room-name">${esc(ROOM[rt])}</text>
       <text x="${cx}" y="${y + 26}" text-anchor="middle" class="room-verse">${v[0]}:${v[1]}</text>
+      ${boss ? `<text x="${cx}" y="${y - RH/2 - 6}" text-anchor="middle" class="room-bossname">${esc(boss.name)}</text>` : ""}
     </a>`;
   });
   return out;
@@ -160,6 +262,7 @@ const routes = [
   [/^#\/surah\/(\d+)$/, surahPage], [/^#\/ayah\/(\d+)$/, ayahPage],
   [/^#\/classes$/, classesPage], [/^#\/class\/(.+)$/, classPage],
   [/^#\/search$/, searchPage], [/^#\/map$/, mapPage],
+  [/^#\/achievements$/, achievementsPage],
 ];
 function router() {
   const hash = location.hash || "#/";
@@ -223,7 +326,7 @@ function renderHomePosition() {
   const encs = encounters(v[0]);
   box.innerHTML = `
     <div class="card">
-      <p class="sub" style="margin-bottom:8px">Room <strong>${last}</strong> of 6,236 · Tome <strong>${t.n} — ${esc(t.en)}</strong> · Encounter ${v[2]}/${encs.length} · Room ${v[3]} of ${v[4]}</p>
+      <p class="sub" style="margin-bottom:8px">Room <strong>${last}</strong> of 6,236 · Tome <strong>${t.n} — ${esc(t.en)}</strong> · Encounter ${v[2]}/${encs.length} · Room ${v[3]} of ${v[4]} · Delver level <strong>${levelOf(visited.size)}</strong> (${visited.size} rooms logged)</p>
       ${encounterStripSVG(v[0], v[2], last)}
       <div class="pager" style="justify-content:center"><a href="${verseURL(last)}">⚔ Resume the delve — Verse ${last}</a></div>
     </div>`;
@@ -282,6 +385,18 @@ function ayahPage(m) {
   const prev = n > 1 ? byGlobal(n - 1) : null;
   const next = n < D.total ? byGlobal(n + 1) : null;
   const pct = (n / D.total * 100).toFixed(1);
+  const boss = rt === "BS" ? bossOf(s, enc) : null;
+  const bossHTML = boss ? `
+      <div class="boss-card">
+        <div class="boss-head">
+          <span class="boss-skull">💀</span>
+          <div class="boss-id"><div class="boss-name">${esc(boss.name)}</div><div class="boss-title">${esc(boss.title)}</div></div>
+          <span class="boss-elem">🌡️ ${esc(t.elem)}</span>
+        </div>
+        <div class="boss-hp"><div class="boss-hp-fill"></div></div>
+        <span class="boss-hp-label">ENGAGED — you stand in its lair</span>
+        <p class="boss-taunt">“${esc(boss.taunt)}”</p>
+      </div>` : "";
   app.innerHTML = `
     <div class="card ayah-card" style="--rc:var(--r-${rar.toLowerCase()})">
       <div class="ayah-head">
@@ -292,7 +407,7 @@ function ayahPage(m) {
         <span class="ref">delve depth ${pct}% of the Grand Dungeon</span>
       </div>
 
-      <div class="map-follow">
+      <div class="map-follow sticky">
         <div class="map-follow-label">🗺️ Follow the map — you are in the glowing room. Click any room to walk there.</div>
         ${encounterStripSVG(s, enc, n)}
         <div class="map-follow-nav">
@@ -314,6 +429,7 @@ function ayahPage(m) {
         ${item ? chip("Loot Gained", item, "🗡️") : chip("Element of the Floor", t.elem, "🌡️")}
         ${chip("Sworn Faction", t.fac, "🚩")}
       </div>
+      ${bossHTML}
       <div class="flavor"><span class="k">Fan Flavor · Not Scripture</span>${esc(flavor)}</div>
 
       <div class="pager">
@@ -324,6 +440,7 @@ function ayahPage(m) {
       </div>
     </div>`;
   window.__ayahN = n;
+  visit(n);
   fetch(API.replace("{s}", s).replace("{a}", a))
     .then(r => r.json())
     .then(j => {
@@ -446,6 +563,43 @@ function mapPage() {
         </div>`;
       }).join("")}
     </div>`;
+}
+
+/* ---------- Achievements ---------- */
+function achievementsPage() {
+  const st = statsOf(visited);
+  let unlocked;
+  try { unlocked = new Set(JSON.parse(localStorage.getItem(ACH_KEY) || "[]")); } catch (e) { unlocked = new Set(); }
+  const lvl = levelOf(st.rooms);
+  const done = ACHIEVEMENTS.filter(a => unlocked.has(a.id) || a.test(st)).length;
+  app.innerHTML = `
+    <div class="ayah-head"><span class="ayah-eyebrow">Feats of the Delve</span><h1 class="hero-title">Achievements</h1>
+      <p class="sub">${done} of ${ACHIEVEMENTS.length} unlocked · your log remembers every room you have entered.</p></div>
+    <div class="card char-sheet">
+      <div class="char-row">
+        <span class="char-level">Lv ${lvl}</span>
+        <div><div class="char-name">Delver of the Codex</div>
+        <div class="char-sub">${st.rooms} / 6,236 rooms · ${st.bosses} bosses engaged · ${st.cleared} floors cleared · ${st.treasure} treasures claimed</div></div>
+      </div>
+      <div class="depth-bar big"><div class="depth-fill" style="width:${(st.rooms / D.total * 100).toFixed(2)}%"></div></div>
+    </div>
+    <div class="grid stagger">
+      ${ACHIEVEMENTS.map(a => {
+        const got = unlocked.has(a.id) || a.test(st);
+        return `<div class="card ach-card ${got ? "ach-got" : "ach-locked"}">
+          <span class="ach-icon">${a.icon}</span>
+          <div class="ach-name">${esc(a.name)}</div>
+          <div class="ach-desc">${esc(a.desc)}</div>
+          <span class="ach-state">${got ? "✔ Unlocked" : "🔒 Locked"}</span>
+        </div>`;
+      }).join("")}
+    </div>
+    ${st.treasure ? `<div class="divider">✦ The Loot Bag ✦</div>
+    <div class="loot-bag">
+      ${[...new Set([...visited].map(n => (byGlobal(n)[8] || ""))).filter(Boolean)].slice(0, 18).map(i => `<span class="loot-tag">🗡️ ${esc(i)}</span>`).join("")}
+      ${(() => { const total = [...new Set([...visited].map(n => (byGlobal(n)[8] || ""))).filter(Boolean)].length; return total > 18 ? `<span class="loot-tag more">…and ${total - 18} more</span>` : ""; })()}
+    </div>` : ""}
+    <p class="sub" style="margin-top:22px">Delve rooms to unlock more — progress is stored in your browser. <a href="#/map">To the map →</a></p>`;
 }
 
 /* ---------- random + keyboard ---------- */

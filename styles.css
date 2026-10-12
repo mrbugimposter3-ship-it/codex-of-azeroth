@@ -190,6 +190,60 @@ kbd{background:#1c2742;border:1px solid var(--gold-dim);border-radius:5px;paddin
 
 /* follow-along strip on ayah page */
 .map-follow{margin:18px 0 6px;padding:16px;border:1px solid var(--panel-b);border-radius:12px;background:rgba(8,13,26,.7)}
+.map-follow.sticky{position:sticky;top:76px;z-index:30;backdrop-filter:blur(10px);
+  box-shadow:0 14px 34px rgba(0,0,0,.55),0 0 24px rgba(232,199,106,.08);border-color:var(--gold-dim)}
+
+/* boss cards */
+.boss-card{margin-top:22px;padding:20px 24px;border-radius:14px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(255,70,85,.10),rgba(10,15,28,.7) 55%);border:1px solid rgba(255,70,85,.45);animation:bossIn .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes bossIn{from{opacity:0;transform:scale(.96) translateY(14px)}to{opacity:1;transform:none}}
+.boss-card::before{content:"";position:absolute;inset:-60px -20px auto;height:120px;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 100%,rgba(255,70,85,.28),transparent 70%);animation:corePulse 4s ease-in-out infinite}
+.boss-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative}
+.boss-skull{font-size:2.6rem;animation:skullBob 3s ease-in-out infinite;filter:drop-shadow(0 0 14px rgba(255,70,85,.7))}
+@keyframes skullBob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+.boss-name{font-family:'Cinzel',serif;font-size:1.5rem;color:#ff6a75;letter-spacing:.06em}
+.boss-title{color:#c98a90;font-size:.92rem;letter-spacing:.1em}
+.boss-elem{margin-left:auto;padding:5px 14px;border:1px solid var(--panel-b);border-radius:999px;font-size:.85rem;color:var(--parchment)}
+.boss-hp{height:14px;border-radius:99px;background:#180a0d;border:1px solid rgba(255,70,85,.5);overflow:hidden;margin:14px 0 6px;position:relative}
+.boss-hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#7a1420,#ff4655 60%,#ff8a95);box-shadow:0 0 14px rgba(255,70,85,.7);transform-origin:left;animation:hpIn 1.1s cubic-bezier(.2,.8,.2,1) both}
+@keyframes hpIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.boss-hp-label{font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:#ff8a95}
+.boss-taunt{margin-top:12px;color:#e8c9cc;font-style:italic;line-height:1.7;position:relative}
+.room-bossname{fill:#ff6a75;font-size:8.5px;font-family:'Cinzel',serif;letter-spacing:.05em;pointer-events:none}
+
+/* achievements */
+.char-sheet{margin-bottom:22px}
+.char-row{display:flex;align-items:center;gap:18px}
+.char-level{display:grid;place-items:center;min-width:64px;height:64px;border-radius:50%;font-family:'Cinzel',serif;
+  font-size:1.3rem;color:var(--gold);border:2px solid var(--gold);box-shadow:0 0 22px rgba(232,199,106,.35),inset 0 0 14px rgba(232,199,106,.2);animation:glyphSpin 20s linear infinite}
+.char-name{font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold)}
+.char-sub{color:#a99f83;font-size:.88rem;margin-top:4px}
+.ach-card{text-align:center;padding:24px 16px}
+.ach-icon{font-size:2.4rem;display:block;margin-bottom:10px}
+.ach-got{border-color:var(--gold-dim)}
+.ach-got .ach-icon{animation:bob 4s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(232,199,106,.6))}
+.ach-locked{opacity:.55;filter:grayscale(.8)}
+.ach-name{font-family:'Cinzel',serif;color:var(--gold);font-size:1.05rem}
+.ach-desc{color:#a99f83;font-size:.85rem;margin:8px 0 12px;line-height:1.5}
+.ach-state{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase}
+.ach-got .ach-state{color:#3df06e}
+.ach-locked .ach-state{color:#6d6553}
+.ach-toast{position:fixed;top:84px;right:24px;z-index:100;display:flex;gap:14px;align-items:center;max-width:360px;
+  padding:14px 20px;border-radius:12px;border:1px solid var(--gold);background:rgba(12,18,34,.95);backdrop-filter:blur(8px);
+  box-shadow:0 0 30px rgba(232,199,106,.4);transform:translateX(120%);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.ach-toast.show{transform:none}
+.ach-toast-icon{font-size:2.2rem;animation:bob 2.5s ease-in-out infinite}
+.ach-toast-title{font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-dim)}
+.ach-toast-name{font-family:'Cinzel',serif;color:var(--gold);font-size:1.05rem}
+.ach-toast-desc{color:#a99f83;font-size:.8rem}
+
+/* loot bag */
+.loot-bag{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.loot-tag{padding:6px 14px;border:1px solid var(--panel-b);border-radius:999px;font-size:.85rem;color:var(--parchment);
+  background:rgba(10,16,32,.6);transition:all .25s;animation:riseIn .5s cubic-bezier(.2,.8,.2,1) both}
+.loot-tag:hover{border-color:var(--gold);transform:translateY(-2px) rotate(-1deg);box-shadow:0 0 14px rgba(232,199,106,.25)}
+.loot-tag.more{color:var(--gold-dim);border-style:dashed}
 .map-follow-label{font-size:.85rem;color:var(--gold-dim);letter-spacing:.1em;margin-bottom:10px;text-align:center}
 .map-follow-nav{display:flex;justify-content:space-between;gap:12px;margin-top:8px;flex-wrap:wrap}
 .map-follow-nav a{padding:7px 14px;border:1px solid var(--panel-b);border-radius:8px;font-size:.9rem;transition:all .25s}
