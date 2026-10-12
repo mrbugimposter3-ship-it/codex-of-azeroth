@@ -143,6 +143,7 @@ function visit(n) {
       newly.slice(0, 3).forEach((a, i) => setTimeout(() => toast(a), 400 + i * 900));
     }
   }
+  updateHUD();
 }
 
 /* ---------- starfield + runes ---------- */
@@ -264,17 +265,62 @@ const routes = [
   [/^#\/search$/, searchPage], [/^#\/map$/, mapPage],
   [/^#\/achievements$/, achievementsPage],
 ];
+const viewportEl = document.getElementById("viewport");
 function router() {
   const hash = location.hash || "#/";
   for (const [re, fn] of routes) {
     const m = hash.match(re);
     if (m) { fn(m); break; }
   }
-  window.scrollTo({ top: 0 });
-  document.querySelectorAll("[data-nav]").forEach(a => a.classList.remove("active"));
+  viewportEl.scrollTo({ top: 0 });
+  updateHUD(hash);
   app.classList.remove("entering"); void app.offsetWidth; app.classList.add("entering");
 }
 addEventListener("hashchange", router);
+
+/* ---------- HUD: zone banner + character frame + action bar ---------- */
+function zoneFor(hash) {
+  let m;
+  if (hash === "#/") return ["The Grand Hall", "Azeroth awaits"];
+  if (hash.startsWith("#/tomes")) return ["The Archive of Floors", "114 floors line the walls"];
+  if ((m = hash.match(/^#\/surah\/(\d+)/))) {
+    const t = D.tomes[Math.min(114, Math.max(1, +m[1])) - 1];
+    return [`Floor ${t.n} — ${t.en}`, `${t.tome} · delve: ${t.dun.slice(2)}`];
+  }
+  if ((m = hash.match(/^#\/ayah\/(\d+)/))) {
+    const n = Math.min(D.total, Math.max(1, +m[1]));
+    const v = byGlobal(n), t = D.tomes[v[0] - 1];
+    return [`Floor ${v[0]} — ${t.en}`, `Room ${n} of 6,236 · ${ROOM[v[5]]}`];
+  }
+  if (hash.startsWith("#/classes")) return ["The Class Hall", "twelve banners hang here"];
+  if ((m = hash.match(/^#\/class\/(.+)/))) return [`${decodeURIComponent(m[1]).replace(/-/g, " ")}s' Hall`, "watch of the sworn"];
+  if (hash.startsWith("#/search")) return ["The Librarium", "seek and ye shall find"];
+  if (hash.startsWith("#/map")) return ["Grand Dungeon Map", "114 floors · 6,236 rooms"];
+  if (hash.startsWith("#/achievements")) return ["Feats of the Delve", "the heralds sing your name"];
+  return ["The Grand Hall", "Azeroth awaits"];
+}
+function updateHUD(hash) {
+  hash = hash || location.hash || "#/";
+  const [zn, zs] = zoneFor(hash);
+  const zEl = document.getElementById("hud-zone"), sEl = document.getElementById("hud-sub"), wrap = document.getElementById("hud-zone-wrap");
+  if (zEl.textContent !== zn || sEl.textContent !== zs) {
+    zEl.textContent = zn; sEl.textContent = zs;
+    wrap.classList.remove("flash"); void wrap.offsetWidth; wrap.classList.add("flash");
+  }
+  const st = statsOf(visited);
+  document.getElementById("hud-level").textContent = "Lv " + levelOf(st.rooms);
+  document.getElementById("hud-xp").style.width = (st.rooms / D.total * 100).toFixed(2) + "%";
+  document.getElementById("hud-xp-label").textContent = `${st.rooms} / ${D.total} rooms`;
+  document.querySelectorAll(".slot[data-go]").forEach(s => s.classList.toggle("active", s.dataset.go === hash));
+}
+/* action bar + orbs + modal */
+document.querySelectorAll(".slot[data-go]").forEach(s => s.addEventListener("click", () => location.hash = s.dataset.go));
+document.getElementById("hud-map").onclick = () => location.hash = "#/map";
+document.getElementById("hud-ach").onclick = () => location.hash = "#/achievements";
+const modal = document.getElementById("modal");
+document.getElementById("hud-info").onclick = () => modal.hidden = false;
+document.getElementById("modal-close").onclick = () => modal.hidden = true;
+modal.addEventListener("click", e => { if (e.target === modal) modal.hidden = true; });
 
 function home() {
   app.innerHTML = `
@@ -609,7 +655,10 @@ addEventListener("keydown", e => {
   const n = window.__ayahN;
   if (n && e.key === "ArrowRight") location.hash = verseURL(Math.min(D.total, n + 1));
   if (n && e.key === "ArrowLeft") location.hash = verseURL(Math.max(1, n - 1));
-  if (e.key === "r" || e.key === "R") location.hash = verseURL(1 + Math.floor(Math.random() * D.total));
+  const k = e.key.toLowerCase();
+  const KEYNAV = { h: "#/", f: "#/tomes", m: "#/map", c: "#/classes", p: "#/achievements", "/": "#/search" };
+  if (KEYNAV[k]) { e.preventDefault(); location.hash = KEYNAV[k]; return; }
+  if (k === "r") location.hash = verseURL(1 + Math.floor(Math.random() * D.total));
 });
 
 router();

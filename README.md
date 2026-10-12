@@ -31,6 +31,13 @@ The codex is laid out as one continuous dungeon run, so consecutive verses read 
 - **Librarium search** — search everything: verse numbers, titles, spells, zones, raids… (`#/search`)
 - **Keyboard navigation** — `←` / `→` prev/next verse, `R` for a random verse
 
+## 🎮 Game-client UI
+The app deliberately does **not** look like a website — it presents as a full-screen game client:
+
+- **Fixed HUD chrome**: a character frame with portrait + XP bar, a WoW-style **zone banner** that announces your current floor/room with a flash animation, and orb buttons (map / feats / about)
+- **Action bar** of beveled ability slots at the bottom, each with a keybind (`H` Grand Hall, `F` Floors, `M` Map, `C` Classes, `P` Feats, `/` Search, `R` Random) — the page itself never scrolls; content lives in an inner scrollable game viewport
+- Content renders in framed **stone-and-gold game windows** with corner ornaments; the disclaimer lives in an in-game modal (📜 orb), not a footer
+
 ## 🎇 Animations
 
 Twinkling starfield canvas, rising arcane runes, rotating portal rings, glowing Arabic script, staggered card entrances, rarity pulsing auras, shimmer loaders, and hover lifts throughout.
